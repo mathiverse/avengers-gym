@@ -7,3 +7,7 @@ body {
     background-color: #1c1c1e; /* Suitable dark color for contrast */
     color: #ffffff; /* Ensure text is readable */
   }
+
+main {
+  padding-top: 80px; /* Matches navbar height of h-20 (5rem = 80px) */
+}

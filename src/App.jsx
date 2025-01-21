@@ -26,13 +26,15 @@ function App() {
       <Router>
         <ScrollToTop />
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/pricing" element={<PricingSection />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/contact" element={<Contact />} />
-        </Routes>
+        <main className="pt-20">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/pricing" element={<PricingSection />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </main>
         <FooterGym />
       </Router>
     </ErrorBoundary>
