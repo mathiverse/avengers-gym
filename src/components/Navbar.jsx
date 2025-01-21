@@ -87,7 +87,7 @@ export default function Header() {
               activeLink === "pricing" ? "text-red-500" : ""
             }`}
           >
-            Pricing
+            Package
           </Navbar.Link>
         </Link>
         <Link to="/contact">

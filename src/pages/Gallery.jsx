@@ -1,35 +1,68 @@
 import React, { useState } from "react";
-import gallery1 from "../assets/gallery1.jpg";
-import gallery2 from "../assets/gallery2.jpg";
+import professionalTrainer from "../assets/gym-trainer-1.jpeg";
+import weightTrainingArea from "../assets/strength-zone-1.jpeg";
+import functionalZone from "../assets/strength-training-zone.jpeg";
+import personalSession from "../assets/personal-trainer-1.jpeg";
+import gymEquipment from "../assets/gallery1.jpg";
+import groupTraining from "../assets/gallery2.jpg";
 // Placeholder image URL for loading state
 const placeholderImage =
   "https://via.placeholder.com/300x200/CCCCCC/FFFFFF?text=Loading...";
 
-// List of gym-related images
+// List of gym-related images with meaningful titles
 const images = [
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9r35h8LyPcu9opVOh251t5baa5LUqQv5ixg&s", // Gym Cardio
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpsgj-xYq2AJhqregKEikf2A1FGbnPtJMkNA&s", // Cardio Exercise
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO8EAlCBEBict46r12JR7N4YN7C9rvvK8A7w&s", // Group Workout
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRi9cEjN0XOh4aKiOsjnKlqUdswyvtz0HwcWA&s", // Gym Equipment
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQD5kMwy-8Px_zySknyUMIEiLsn45Iff7B_06Ch3sAMMkZ2A59xW1wQ88FCUjbJ78gD9QI&usqp=CAU", // Weight Lifting
-  gallery1,
-  gallery2,
+  {
+    url: professionalTrainer,
+    id: crypto.randomUUID(),
+    alt: "Professional Trainer Demonstration",
+    title: "Expert Training Guidance",
+    category: "trainers"
+  },
+  {
+    url: weightTrainingArea,
+    id: crypto.randomUUID(),
+    alt: "Advanced Weight Training Zone",
+    title: "State-of-the-art Equipment",
+    category: "equipment"
+  },
+  {
+    url: functionalZone,
+    id: crypto.randomUUID(),
+    alt: "Functional Training Area",
+    title: "Functional Fitness Zone",
+    category: "classes"
+  },
+  {
+    url: personalSession,
+    id: crypto.randomUUID(),
+    alt: "Personal Training Session",
+    title: "One-on-One Training",
+    category: "trainers"
+  },
+  {
+    url: gymEquipment,
+    id: crypto.randomUUID(),
+    alt: "Modern Gym Equipment",
+    title: "Premium Fitness Equipment",
+    category: "equipment"
+  },
+  {
+    url: groupTraining,
+    id: crypto.randomUUID(),
+    alt: "Group Training Session",
+    title: "Group Fitness Classes",
+    category: "classes"
+  }
 ];
 
 const Gallery = () => {
-  const [loadedImages, setLoadedImages] = useState(
-    new Array(images.length).fill(false),
-  );
+  const [loadedImages, setLoadedImages] = useState(new Set());
   const [previewImage, setPreviewImage] = useState(null); // To store image to preview
   const [currentImageIndex, setCurrentImageIndex] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('all');
 
-  // Function to handle image loading
-  const handleImageLoad = (index) => {
-    setLoadedImages((prevState) => {
-      const updated = [...prevState];
-      updated[index] = true;
-      return updated;
-    });
+  const handleImageLoad = (imageId) => {
+    setLoadedImages(prev => new Set(prev).add(imageId));
   };
 
   // Function to open preview modal
@@ -48,76 +81,102 @@ const Gallery = () => {
   const navigateImage = (direction) => {
     const newIndex =
       (currentImageIndex + direction + images.length) % images.length;
-    setPreviewImage(images[newIndex]);
+    setPreviewImage(images[newIndex].url);
     setCurrentImageIndex(newIndex);
   };
 
+  const filteredImages = activeCategory === 'all' 
+    ? images 
+    : images.filter(img => img.category === activeCategory);
+
   return (
-    <section className="mx-auto min-h-[600px] max-w-screen-xl px-4 py-8">
-      <h2 className="mb-6 text-center text-3xl font-semibold">
+    <section className="mx-auto min-h-[600px] max-w-screen-xl px-4 py-12">
+      <h2 className="mb-8 text-center text-4xl font-bold text-white" data-aos="fade-up">
         Our Gym Gallery
       </h2>
+      <p className="mb-12 text-center text-gray-300 text-lg" data-aos="fade-up" data-aos-delay="100">
+        Explore our state-of-the-art facilities and training sessions
+      </p>
 
-      {/* Gallery Grid Layout */}
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {images.map((imageSrc, index) => (
-          <div
-            key={index}
-            className="group relative cursor-pointer overflow-hidden rounded-xl shadow-lg"
-            onClick={() => openPreview(imageSrc, index)} // Open image preview on click
+      <div className="flex justify-center gap-4 mb-8">
+        {['all', 'trainers', 'equipment', 'classes'].map(category => (
+          <button
+            key={category}
+            onClick={() => setActiveCategory(category)}
+            className={`px-4 py-2 rounded-full transition-all ${
+              activeCategory === category 
+                ? 'bg-red-600 text-white' 
+                : 'bg-gray-800 text-gray-300 hover:bg-red-700'
+            }`}
           >
-            <img
-              className={`h-auto w-full rounded-xl object-cover transition-opacity duration-300 ${
-                loadedImages[index] ? "opacity-100" : "opacity-0"
-              }`}
-              src={imageSrc}
-              alt={`Gym Image ${index + 1}`}
-              onLoad={() => handleImageLoad(index)}
-              loading="lazy"
-              style={{
-                opacity: loadedImages[index] ? "1" : "0",
-                transition: "opacity 1s ease-in-out",
-              }}
-            />
-            {/* Placeholder image */}
-            {!loadedImages[index] && (
-              <img
-                className="absolute inset-0 h-auto w-full rounded-xl object-cover"
-                src={placeholderImage}
-                alt="Loading..."
-              />
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Gallery Grid Layout - Improved responsiveness */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 md:gap-8" 
+           data-aos="fade-up" data-aos-delay="200">
+        {filteredImages.map((image) => (
+          <div
+            key={image.id}
+            className="group relative cursor-pointer overflow-hidden rounded-xl shadow-lg transition-transform duration-300 hover:scale-105"
+            onClick={() => openPreview(image.url, images.indexOf(image))}
+          >
+            {/* Loading skeleton with aspect ratio */}
+            {!loadedImages.has(image.id) && (
+              <div className="absolute inset-0 animate-pulse bg-gray-200">
+                <div className="pb-[75%]" /> {/* 4:3 aspect ratio */}
+              </div>
             )}
-            {/* Hover text */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 text-lg font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <span>Gym Moment #{index + 1}</span>
+            
+            <div className="aspect-[4/3] w-full">
+              <img
+                className={`h-full w-full object-cover transition-all duration-500 ${
+                  loadedImages.has(image.id) 
+                    ? "opacity-100 scale-100" 
+                    : "opacity-0 scale-95"
+                }`}
+                src={image.url}
+                alt={image.alt}
+                onLoad={() => handleImageLoad(image.id)}
+                loading="lazy"
+              />
+            </div>
+
+            {/* Enhanced hover overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-40 p-4 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
+              <h3 className="text-xl font-bold text-white mb-2">{image.title}</h3>
+              <p className="text-sm text-gray-200 text-center">{image.alt}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Image Preview Modal */}
+      {/* Enhanced Image Preview Modal */}
       {previewImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm"
           onClick={closePreview}
         >
-          <div className="relative h-[70vh] w-full max-w-4xl overflow-hidden rounded-lg bg-white bg-opacity-30 shadow-lg backdrop-blur-md">
-            <div className="relative h-full">
-              {/* Image */}
+          <div className="relative h-[80vh] w-[90vw] max-w-5xl overflow-hidden rounded-lg bg-black bg-opacity-90 shadow-2xl">
+            <div className="relative h-full flex items-center justify-center p-4">
+              {/* Image with improved sizing */}
               <img
                 src={previewImage}
-                alt="Preview"
-                className="h-full w-full rounded-lg object-contain"
+                alt={images[currentImageIndex].alt}
+                className="max-h-full max-w-full rounded-lg object-contain"
               />
 
-              {/* Navigation Arrows */}
+              {/* Enhanced Navigation Arrows */}
               <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 transform justify-between px-4">
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent closing when clicking on arrows
+                    e.stopPropagation();
                     navigateImage(-1);
                   }}
-                  className="rounded-full bg-red-600 p-4 text-3xl text-white"
+                  className="rounded-full bg-red-600 p-4 text-3xl text-white opacity-75 transition-opacity hover:opacity-100 hover:bg-red-700"
+                  aria-label="Previous image"
                 >
                   ←
                 </button>
@@ -126,20 +185,28 @@ const Gallery = () => {
                     e.stopPropagation();
                     navigateImage(1);
                   }}
-                  className="rounded-full bg-red-600 p-4 text-3xl text-white"
+                  className="rounded-full bg-red-600 p-4 text-3xl text-white opacity-75 transition-opacity hover:opacity-100 hover:bg-red-700"
+                  aria-label="Next image"
                 >
                   →
                 </button>
               </div>
-            </div>
 
-            {/* Close Button */}
-            <button
-              className="absolute right-2 top-2 rounded-full bg-red-600 p-2 text-xl text-white"
-              onClick={closePreview}
-            >
-              X
-            </button>
+              {/* Enhanced Close Button */}
+              <button
+                className="absolute right-4 top-4 rounded-full bg-red-600 p-2 text-xl text-white opacity-75 transition-opacity hover:opacity-100 hover:bg-red-700"
+                onClick={closePreview}
+                aria-label="Close preview"
+              >
+                ✕
+              </button>
+
+              {/* Image Caption */}
+              <div className="absolute bottom-4 left-0 right-0 text-center text-white">
+                <h3 className="text-xl font-bold">{images[currentImageIndex].title}</h3>
+                <p className="text-sm text-gray-300">{images[currentImageIndex].alt}</p>
+              </div>
+            </div>
           </div>
         </div>
       )}

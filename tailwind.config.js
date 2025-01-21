@@ -1,13 +1,15 @@
-import flowbite from "flowbite-react/tailwind";
-
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", flowbite.content()],
+module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "node_modules/flowbite-react/lib/esm/**/*.js"
+  ],
   theme: {
     extend: {
       colors: {
-        darkRed: "#7f1d1d", // Customize as needed
-        lightDark: "#1c1c1e", // Suitable contrast color
+        darkRed: "#7f1d1d",
+        lightDark: "#1c1c1e",
         primary: {
           50: "#fef2f2",
           100: "#fee2e2",
@@ -24,5 +26,7 @@ export default {
       },
     },
   },
-  plugins: [flowbite.plugin()],
-};
+  plugins: [
+    require('flowbite/plugin')
+  ],
+}
