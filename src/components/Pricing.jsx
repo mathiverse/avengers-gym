@@ -3,6 +3,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { FaWhatsapp } from "react-icons/fa";
 import video3 from "../assets/vid-3.mp4";
+import { Link } from "react-router-dom";
 
 const PackageSection = () => {
   const packages = [
@@ -161,13 +162,17 @@ const PackageSection = () => {
                   ))}
                 </ul>
 
-                <button className={`w-full rounded-lg ${
-                  pkg.popular 
-                    ? 'bg-red-600 hover:bg-red-700' 
-                    : 'bg-gray-700 hover:bg-gray-600'
-                  } px-6 py-3 text-white transition-colors`}>
-                  Choose {pkg.name}
-                </button>
+                <Link
+                  to="/contact"
+                  className={`inline-flex items-center justify-center w-full px-5 py-3 mt-8 text-base font-medium text-white 
+                    ${pkg.popular ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'} 
+                    rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg group`}
+                >
+                  Choose Plan
+                  <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
               </div>
             </div>
           ))}

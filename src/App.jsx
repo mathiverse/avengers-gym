@@ -11,6 +11,7 @@ import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
 import ScrollToTop from "./components/ScrollToTop";
 import ErrorBoundary from './components/ErrorBoundary';
+import { WhatsAppButton } from "./components/WhatsAppButton";
 
 function App() {
   useEffect(() => {
@@ -36,6 +37,7 @@ function App() {
           </Routes>
         </main>
         <FooterGym />
+        <WhatsAppButton />
       </Router>
     </ErrorBoundary>
   );

@@ -6,6 +6,7 @@ import trainer2 from "../assets/trainer2.jpeg";
 import trainer3 from "../assets/trainer3.jpeg";
 import trainer4 from "../assets/trainer4.jpeg";
 import trainer5 from "../assets/trainer5.jpeg";
+import { Link } from "react-router-dom";
 
 const trainerImages = [
   {
@@ -86,12 +87,12 @@ const About = () => {
               you to achieve your fitness goals. Together, we strive for
               greatness.
             </p>
-            <a
-              href="#"
-              className="inline-block rounded-full bg-red-600 px-6 py-3 text-lg font-medium text-white hover:bg-red-700"
+            <Link
+              to="/contact"
+              className="inline-block rounded-full bg-red-600 px-6 py-3 text-lg font-medium text-white hover:bg-red-700 transition-all duration-300 hover:scale-105"
             >
               Join Us Now
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -107,13 +108,33 @@ const About = () => {
         </div>
         <div className="mb-2 flex w-6/12 items-center justify-center">
           <div className="items-center rounded-lg bg-gradient-to-r from-red-600 via-red-500 to-red-700 shadow-lg dark:border-red-800 dark:bg-red-700 sm:flex">
-            <a onClick={() => openPreview(trainer1, 0)} className="cursor-pointer transition-transform hover:scale-105">
+            <div className="relative group cursor-pointer" onClick={() => openPreview(trainer1, 0)}>
               <img
-                className="w-full rounded-lg sm:rounded-none sm:rounded-l-lg"
+                className="w-full rounded-lg sm:rounded-none sm:rounded-l-lg transition-transform duration-300 group-hover:scale-105"
                 src={trainer1}
-                alt="V K Mareeswaran"
+                alt="Mareeswaran"
               />
-            </a>
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 hidden sm:flex items-center justify-center">
+                <div className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                  <p className="text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded-full flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                    </svg>
+                    Click to view gallery
+                  </p>
+                </div>
+              </div>
+              <div className="absolute bottom-2 right-2 sm:hidden">
+                <div className="bg-black bg-opacity-60 px-3 py-1 rounded-full flex items-center animate-pulse">
+                  <svg className="w-4 h-4 mr-1 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-white text-xs">Tap to view more</span>
+                </div>
+              </div>
+            </div>
             <div className="p-5">
               <h3 className="text-xl font-bold tracking-tight text-white">
                 <a href="#">V K Mareeswaran</a>
