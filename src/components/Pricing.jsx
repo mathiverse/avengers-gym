@@ -125,7 +125,7 @@ const PackageSection = () => {
               +91 94427 17478
             </a>
           </div>
-          <p className="text-gray-300 mt-4">Time: 4:30 PM to 9:30 PM</p>
+          <p className="text-gray-300 mt-4">Time: Morning (5:30 AM - 9:30 AM), Evening (4:30 PM - 9:30 PM)</p>
         </div>
 
         {/* Packages Grid */}
@@ -202,7 +202,8 @@ const PackageSection = () => {
         <div className="mt-16 text-center bg-black bg-opacity-50 p-8 rounded-lg max-w-4xl mx-auto">
           <h3 className="text-2xl font-bold text-white mb-4">Working Hours</h3>
           <p className="text-gray-300 text-lg">
-            Open Daily: 4:30 PM to 9:30 PM
+            Morning: 5:30 AM - 9:30 AM<br />
+            Evening: 4:30 PM - 9:30 PM
           </p>
         </div>
 
