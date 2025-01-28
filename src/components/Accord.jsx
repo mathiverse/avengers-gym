@@ -3,7 +3,7 @@ import { Accordion } from "flowbite-react";
 
 const FAQAccordion = () => {
   const faqs = [
-    { question: "What are the gym timings?", answer: "6 AM to 10 PM daily." },
+    { question: "What are the gym timings?", answer: "Morning: 5:30 AM - 9:30 AM, Evening: 4:30 PM - 9:30 PM" },
     { question: "Do you offer personal training?", answer: "Yes, we do!" },
     { question: "What facilities are available?", answer: "Equipment, classes, and trainers." },
     { question: "Is there a trial period?", answer: "We offer a 1-week free trial." },

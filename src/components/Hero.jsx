@@ -24,7 +24,7 @@ const HeroSection = () => {
           Empower Your Fitness Journey
         </h1>
         <p className="mb-8 max-w-2xl text-lg sm:text-xl" data-aos="fade-up">
-          Join the ultimate gym experience. Build strength, endurance, and
+          Join the ultimate gym experience. Build strength, endurance and
           confidence with our state-of-the-art equipment and expert trainers.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">

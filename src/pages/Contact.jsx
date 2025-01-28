@@ -201,7 +201,7 @@ const Contact = () => {
               required
             >
               <option value="">Select preferred time</option>
-              <option value="morning">Morning (5:30 AM - 11:30 AM)</option>
+              <option value="morning">Morning (5:30 AM - 9:30 AM)</option>
               <option value="evening">Evening (4:30 PM - 9:30 PM)</option>
             </select>
           </div>
@@ -277,7 +277,7 @@ const Contact = () => {
             <div className="flex justify-center space-x-8 text-gray-300">
               <div>
                 <p className="font-semibold text-white">Opening Hours</p>
-                <p>Morning: 5:30 AM - 11:30 AM</p>
+                <p>Morning: 5:30 AM - 9:30 AM</p>
                 <p>Evening: 4:30 PM - 9:30 PM</p>
               </div>
               <div>
