@@ -1,14 +1,28 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Contact = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get package type from URL parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const packageFromUrl = params.get('package');
+    if (packageFromUrl) {
+      setFormData(prev => ({
+        ...prev,
+        packageType: packageFromUrl
+      }));
+    }
+  }, [location]);
+
   // Form state management
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    packageType: '', // Changed from membershipType
+    packageType: '', // This will now be pre-filled if coming from pricing page
     preferredTime: '',
     trainingType: '',
     message: ''

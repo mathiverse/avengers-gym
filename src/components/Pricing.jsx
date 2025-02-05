@@ -163,7 +163,10 @@ const PackageSection = () => {
                 </ul>
 
                 <Link
-                  to="/contact"
+                  to={{
+                    pathname: "/contact",
+                    search: `?package=${pkg.name === "Contest Preparation" ? "contest" : pkg.name === "Personal Training" ? "personal" : "online"}`
+                  }}
                   className={`inline-flex items-center justify-center w-full px-5 py-3 mt-8 text-base font-medium text-white 
                     ${pkg.popular ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'} 
                     rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg group`}
