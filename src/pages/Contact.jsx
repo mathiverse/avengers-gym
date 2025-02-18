@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../styles/datepicker.css"; // Import our custom styles
+import { FaCreditCard, FaUniversity, FaQrcode, FaMoneyBillWave } from 'react-icons/fa';
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -22,14 +26,120 @@ const Contact = () => {
     name: '',
     email: '',
     phone: '',
-    packageType: '', // This will now be pre-filled if coming from pricing page
-    preferredTime: '',
+    packageType: '',
     trainingType: '',
-    message: ''
+    message: '',
+    bookingDate: null,
+    paymentMethod: '',
+    paymentType: '' // 'direct' or 'online'
   });
+  const [currentStep, setCurrentStep] = useState(1); // Track form steps
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
   const [showModal, setShowModal] = useState(false);
+
+  // Get package details based on type
+  const getPackageDetails = (type) => {
+    switch(type) {
+      case 'contest':
+        return {
+          name: 'Contest Preparation',
+          price: 6000,
+          duration: 'month'
+        };
+      case 'personal':
+        return {
+          name: 'Personal Training',
+          price: 3000,
+          duration: 'month'
+        };
+      case 'online':
+        return {
+          name: 'Online Coaching',
+          price: 3000,
+          duration: 'month'
+        };
+      default:
+        return null;
+    }
+  };
+
+  // Handle payment method selection
+  const handlePaymentMethodSelect = (method) => {
+    setFormData(prev => ({
+      ...prev,
+      paymentMethod: method
+    }));
+  };
+
+  // Handle payment type selection
+  const handlePaymentTypeSelect = (type) => {
+    setFormData(prev => ({
+      ...prev,
+      paymentType: type
+    }));
+  };
+
+  // Function to proceed to next step
+  const handleNextStep = (e) => {
+    e.preventDefault();
+    if (validateCurrentStep()) {
+      setCurrentStep(prev => prev + 1);
+      // Scroll to top of the page smoothly
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Function to go back to previous step
+  const handlePreviousStep = () => {
+    setCurrentStep(prev => prev - 1);
+    // Also scroll to top when going back
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Validate current step
+  const validateCurrentStep = () => {
+    if (currentStep === 1) {
+      return formData.name && formData.email && formData.phone && 
+             formData.packageType && formData.trainingType && formData.bookingDate && formData.paymentType;
+    }
+    return true;
+  };
+
+  // Handle date change
+  const handleDateChange = (date) => {
+    setFormData(prev => ({
+      ...prev,
+      bookingDate: date
+    }));
+  };
+
+  // Filter available time slots based on selected date
+  const filterPassedTime = (time) => {
+    const currentDate = new Date();
+    const selectedDate = new Date(time);
+
+    // If it's the same day, only show future times
+    if (currentDate.toDateString() === selectedDate.toDateString()) {
+      return currentDate.getTime() < selectedDate.getTime();
+    }
+
+    // Get hours for morning and evening slots
+    const hours = selectedDate.getHours();
+    const minutes = selectedDate.getMinutes();
+    const timeInMinutes = hours * 60 + minutes;
+
+    // Morning slot: 5:30 AM - 9:30 AM (330 - 570 minutes)
+    // Evening slot: 4:30 PM - 9:30 PM (990 - 1290 minutes)
+    return (timeInMinutes >= 330 && timeInMinutes <= 570) || 
+           (timeInMinutes >= 990 && timeInMinutes <= 1290);
+  };
 
   // Handle modal close
   const handleCloseModal = () => {
@@ -80,9 +190,11 @@ const Contact = () => {
           email: '',
           phone: '',
           packageType: '',
-          preferredTime: '',
           trainingType: '',
-          message: ''
+          message: '',
+          bookingDate: null,
+          paymentMethod: '',
+          paymentType: ''
         });
         
         if (data.previewUrls) {
@@ -105,6 +217,90 @@ const Contact = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Calculate minimum date (today)
+  const minDate = new Date();
+  
+  // Calculate maximum date (2 weeks from today)
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 14);
+
+  // Render payment section
+  const renderPaymentSection = () => {
+    const packageDetails = getPackageDetails(formData.packageType);
+    
+    return (
+      <div className="space-y-8">
+        <div className="bg-black bg-opacity-40 p-6 rounded-lg">
+          <h3 className="text-xl font-semibold text-white mb-4">Booking Summary</h3>
+          <div className="space-y-2 text-gray-300">
+            <p><span className="font-medium">Package:</span> {packageDetails?.name}</p>
+            <p><span className="font-medium">Amount:</span> ₹{packageDetails?.price}/{packageDetails?.duration}</p>
+            <p><span className="font-medium">Training Focus:</span> {formData.trainingType.replace('-', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>
+            <p><span className="font-medium">Session Date:</span> {formData.bookingDate?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p><span className="font-medium">Session Time:</span> {formData.bookingDate?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold text-white">Select Payment Method</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              type="button"
+              onClick={() => handlePaymentMethodSelect('card')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                formData.paymentMethod === 'card'
+                  ? 'border-red-500 bg-red-500 bg-opacity-20'
+                  : 'border-gray-600 hover:border-red-500'
+              }`}
+            >
+              <div className="flex flex-col items-center text-white space-y-2">
+                <FaCreditCard className="text-2xl" />
+                <span>Card Payment</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePaymentMethodSelect('netbanking')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                formData.paymentMethod === 'netbanking'
+                  ? 'border-red-500 bg-red-500 bg-opacity-20'
+                  : 'border-gray-600 hover:border-red-500'
+              }`}
+            >
+              <div className="flex flex-col items-center text-white space-y-2">
+                <FaUniversity className="text-2xl" />
+                <span>Net Banking</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePaymentMethodSelect('upi')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                formData.paymentMethod === 'upi'
+                  ? 'border-red-500 bg-red-500 bg-opacity-20'
+                  : 'border-gray-600 hover:border-red-500'
+              }`}
+            >
+              <div className="flex flex-col items-center text-white space-y-2">
+                <FaQrcode className="text-2xl" />
+                <span>UPI</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div className="pt-4">
+          <p className="text-sm text-gray-400 mb-4">
+            By proceeding with the payment, you agree to our terms and conditions.
+            Your booking will be confirmed after successful payment.
+          </p>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -142,124 +338,232 @@ const Contact = () => {
 
       <div className="relative z-10 py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
         <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-center text-white dark:text-white" data-aos="fade-up" data-aos-duration="1000">
-          Book Your Session
+          {currentStep === 1 ? "Book Your Session" : "Complete Payment"}
         </h2>
         <p className="mb-8 lg:mb-16 font-light text-center text-gray-300 dark:text-gray-400 sm:text-xl" data-aos="fade-up" data-aos-duration="1200">
-          Ready to start your fitness journey? Fill out the form below and we'll help you get started!
+          {currentStep === 1 ? "Ready to start your fitness journey? Fill out the form below and we'll help you get started!" : "Please review your booking details and complete the payment"}
         </p>
         
         <form onSubmit={handleSubmit} className="space-y-8 bg-opacity-70 p-8 rounded-lg shadow-lg backdrop-blur-xl bg-darkRed dark:bg-opacity-80" data-aos="zoom-in" data-aos-duration="1200">
-          <div>
-            <label htmlFor="name" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Your Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-              placeholder="Full Name"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Your Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-              placeholder="name@example.com"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="phone" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Phone Number</label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-              placeholder="Your phone number"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="packageType" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Package Type</label>
-            <select
-              id="packageType"
-              name="packageType"
-              value={formData.packageType}
-              onChange={handleChange}
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-              required
-            >
-              <option value="">Select a package</option>
-              <option value="contest">Contest Preparation (₹6,000/month)</option>
-              <option value="personal">Personal Training (₹3,000/month)</option>
-              <option value="online">Online Coaching (₹3,000/month)</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="preferredTime" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Preferred Training Time</label>
-            <select
-              id="preferredTime"
-              name="preferredTime"
-              value={formData.preferredTime}
-              onChange={handleChange}
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-              required
-            >
-              <option value="">Select preferred time</option>
-              <option value="morning">Morning (5:30 AM - 9:30 AM)</option>
-              <option value="evening">Evening (4:30 PM - 9:30 PM)</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="trainingType" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Training Focus</label>
-            <select
-              id="trainingType"
-              name="trainingType"
-              value={formData.trainingType}
-              onChange={handleChange}
-              className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-              required
-            >
-              <option value="">Select training focus</option>
-              <option value="weight-gain">Weight Gain</option>
-              <option value="fat-loss">Fat Loss</option>
-              <option value="cardio">Cardio Classes</option>
-              <option value="diet">Diet & Nutrition</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="message" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-400">Additional Information</label>
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              rows="4"
-              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-red-500 focus:border-red-500"
-              placeholder="Any specific goals, health conditions, or questions..."
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-red-700 sm:w-fit hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {isLoading ? 'Sending...' : 'Book Session'}
-          </button>
-        </form>
+          {currentStep === 1 ? (
+            <div className="space-y-8">
+              <div>
+                <label htmlFor="name" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Your Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
+                  placeholder="Full Name"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Your Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
+                  placeholder="name@example.com"
+                  required
+                />
+              </div>
 
-        <section className="mt-16">
+              <div>
+                <label htmlFor="phone" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Phone Number</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
+                  placeholder="Your phone number"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="packageType" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Package Type</label>
+                <select
+                  id="packageType"
+                  name="packageType"
+                  value={formData.packageType}
+                  onChange={handleChange}
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
+                  required
+                >
+                  <option value="">Select a package</option>
+                  <option value="contest">Contest Preparation (₹6,000/month)</option>
+                  <option value="personal">Personal Training (₹3,000/month)</option>
+                  <option value="online">Online Coaching (₹3,000/month)</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="bookingDate" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">
+                  Preferred Date and Time
+                </label>
+                <div className="date-picker-wrapper">
+                  <DatePicker
+                    selected={formData.bookingDate}
+                    onChange={handleDateChange}
+                    showTimeSelect
+                    filterTime={filterPassedTime}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                    dateFormat="MMMM d, yyyy h:mm aa"
+                    placeholderText="Select date and time"
+                    className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
+                    required
+                    timeIntervals={30}
+                    timeCaption="Select Time"
+                    showTimeSelectOnly={false}
+                    timeFormat="h:mm aa"
+                    popperClassName="date-picker-popper"
+                    calendarClassName="date-picker-calendar"
+                    timeClassName={time => {
+                      const hours = time.getHours();
+                      const minutes = time.getMinutes();
+                      const timeInMinutes = hours * 60 + minutes;
+                      
+                      // Morning slot: 5:30 AM - 9:30 AM (330 - 570 minutes)
+                      // Evening slot: 4:30 PM - 9:30 PM (990 - 1290 minutes)
+                      const isAvailable = 
+                        (timeInMinutes >= 330 && timeInMinutes <= 570) || 
+                        (timeInMinutes >= 990 && timeInMinutes <= 1290);
+                      
+                      return isAvailable ? 'available-time-slot' : 'unavailable-time-slot';
+                    }}
+                  />
+                </div>
+                <p className="mt-1 text-sm text-gray-300">
+                  Note: You can book sessions up to 2 weeks in advance. Available time slots:
+                  <br />Morning: 5:30 AM - 9:30 AM
+                  <br />Evening: 4:30 PM - 9:30 PM
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="trainingType" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Training Focus</label>
+                <select
+                  id="trainingType"
+                  name="trainingType"
+                  value={formData.trainingType}
+                  onChange={handleChange}
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
+                  required
+                >
+                  <option value="">Select training focus</option>
+                  <option value="weight-gain">Weight Gain</option>
+                  <option value="fat-loss">Fat Loss</option>
+                  <option value="cardio">Cardio Classes</option>
+                  <option value="diet">Diet & Nutrition</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Payment Type</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handlePaymentTypeSelect('direct')}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      formData.paymentType === 'direct'
+                        ? 'border-red-500 bg-red-500 bg-opacity-20'
+                        : 'border-gray-600 hover:border-red-500'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center text-white space-y-2">
+                      <FaMoneyBillWave className="text-2xl" />
+                      <span>Direct Payment at Gym</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handlePaymentTypeSelect('online')}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      formData.paymentType === 'online'
+                        ? 'border-red-500 bg-red-500 bg-opacity-20'
+                        : 'border-gray-600 hover:border-red-500'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center text-white space-y-2">
+                      <FaCreditCard className="text-2xl" />
+                      <span>Online Payment</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-400">Additional Information</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows="4"
+                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-red-500 focus:border-red-500"
+                  placeholder="Any specific goals, health conditions, or questions..."
+                ></textarea>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {renderPaymentSection()}
+            </div>
+          )}
+
+          <div className="flex justify-between space-x-4">
+            {currentStep === 1 && (
+              <button
+                type="button"
+                onClick={formData.paymentType === 'direct' ? handleSubmit : handleNextStep}
+                disabled={!validateCurrentStep()}
+                className={`py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-red-700 w-full hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 ${
+                  !validateCurrentStep() ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {formData.paymentType === 'direct' ? 'Book Session' : 'Proceed to Payment'}
+              </button>
+            )}
+            
+            {currentStep === 2 && (
+              <>
+                <button
+                  type="button"
+                  onClick={handlePreviousStep}
+                  className="py-3 px-5 text-sm font-medium text-center text-white rounded-lg border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 w-1/2"
+                >
+                  Back
+                </button>
+                
+                <button
+                  type="submit"
+                  disabled={isLoading || !formData.paymentMethod}
+                  className={`py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-red-700 w-1/2 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 ${
+                    (isLoading || !formData.paymentMethod) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {isLoading ? 'Processing...' : 'Pay Now'}
+                </button>
+              </>
+            )}
+          </div>
+        </form>
+      </div>
+
+      {/* Find Us Section - Moved outside the form */}
+      <div className="relative z-10 py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
+        <section>
           <h2 className="text-3xl font-bold text-center text-white mb-8">Find Us</h2>
           
           {/* Location Details */}

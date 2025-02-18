@@ -9,10 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/react-datepicker": "^7.0.0",
     "aos": "^2.3.4",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.2",
+    "razorpay": "^2.9.5",
     "react": "^18.2.0",
+    "react-datepicker": "^8.1.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.3"
   },
