@@ -14,9 +14,28 @@ const Contact = () => {
     const params = new URLSearchParams(location.search);
     const packageFromUrl = params.get('package');
     if (packageFromUrl) {
+      // Map the URL parameter to the correct package type value
+      let packageType = '';
+      switch(packageFromUrl) {
+        case 'normal':
+          packageType = 'normal';
+          break;
+        case 'treadmill':
+          packageType = 'treadmill';
+          break;
+        case 'personal':
+          packageType = 'personal';
+          break;
+        case 'contest':
+          packageType = 'contest';
+          break;
+        default:
+          packageType = packageFromUrl;
+      }
+      
       setFormData(prev => ({
         ...prev,
-        packageType: packageFromUrl
+        packageType: packageType
       }));
     }
   }, [location]);
@@ -41,10 +60,16 @@ const Contact = () => {
   // Get package details based on type
   const getPackageDetails = (type) => {
     switch(type) {
-      case 'contest':
+      case 'normal':
         return {
-          name: 'Contest Preparation',
-          price: 6000,
+          name: 'Normal Gym Fees',
+          price: 700,
+          duration: 'month'
+        };
+      case 'treadmill':
+        return {
+          name: 'Normal Fees + Treadmill',
+          price: 900,
           duration: 'month'
         };
       case 'personal':
@@ -53,10 +78,10 @@ const Contact = () => {
           price: 3000,
           duration: 'month'
         };
-      case 'online':
+      case 'contest':
         return {
-          name: 'Online Coaching',
-          price: 3000,
+          name: 'Contest Preparation',
+          price: 6000,
           duration: 'month'
         };
       default:
@@ -305,6 +330,14 @@ const Contact = () => {
 
   return (
     <section className="relative bg-gradient-to-b from-black to-red-900">
+      {/* Add WhatsApp-style doodle pattern background */}
+      <div 
+        className="absolute inset-0 z-0 opacity-10"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M0 0h10v10H0zm10 10h10v10H10zm10 0h10v10H20zm10 0h10v10H30zm10 0h10v10H40zm0-10h10v10H40zm10 10h10v10H50zm10 0h10v10H60zm10 0h10v10H70zm0-10h10v10H70zM10 20h10v10H10zm10 0h10v10H20zm10 0h10v10H30zm30 0h10v10H60zm10 0h10v10H70zM10 30h10v10H10zm60 0h10v10H70zM10 40h10v10H10zm60 0h10v10H70zM10 50h10v10H10zm60 0h10v10H70zM10 60h10v10H10zm60 0h10v10H70zM10 70h10v10H10zm10 0h10v10H20zm10 0h10v10H30zm10 0h10v10H40zm10 0h10v10H50zm10 0h10v10H60zm10 0h10v10H70z'/%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: '80px 80px'
+        }}
+      ></div>
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
@@ -344,7 +377,7 @@ const Contact = () => {
           {currentStep === 1 ? "Ready to start your fitness journey? Fill out the form below and we'll help you get started!" : "Please review your booking details and complete the payment"}
         </p>
         
-        <form onSubmit={handleSubmit} className="space-y-8 bg-opacity-70 p-8 rounded-lg shadow-lg backdrop-blur-xl bg-darkRed dark:bg-opacity-80" data-aos="zoom-in" data-aos-duration="1200">
+        <form onSubmit={handleSubmit} className="space-y-8 bg-black bg-opacity-70 p-8 rounded-lg shadow-lg backdrop-blur-xl border border-red-800 relative z-20" data-aos="zoom-in" data-aos-duration="1200">
           {currentStep === 1 ? (
             <div className="space-y-8">
               <div>
@@ -400,9 +433,10 @@ const Contact = () => {
                   required
                 >
                   <option value="">Select a package</option>
-                  <option value="contest">Contest Preparation (₹6,000/month)</option>
+                  <option value="normal">Normal Gym Fees (₹700/month)</option>
+                  <option value="treadmill">Normal Fees + Treadmill (₹900/month)</option>
                   <option value="personal">Personal Training (₹3,000/month)</option>
-                  <option value="online">Online Coaching (₹3,000/month)</option>
+                  <option value="contest">Contest Preparation (₹6,000/month)</option>
                 </select>
               </div>
 
