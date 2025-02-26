@@ -58,10 +58,34 @@ const PackageSection = () => {
       studentOffer: true,
       studentPrice: "2000",
       highlights: [
-        "Dedicated Trainer",
-        "Custom Workout Plan",
-        "Progress Tracking",
-        "Nutrition Advice"
+        "One-on-One Training Sessions",
+        "Customized Workout Plans",
+        "Form Correction",
+        "Diet Nutrition Guidance",
+        "Weight Gain/Loss Programs",
+        "Progress Monitoring",
+        "Cardio Classes Access"
+      ]
+    },
+    {
+      name: "Online Coaching",
+      features: [
+        { duration: "1 Month", price: "3000", originalPrice: "3500" },
+        { duration: "3 Months", price: "8500", originalPrice: "9000" },
+        { duration: "6 Months", price: "16000", originalPrice: "18000" },
+        { duration: "Annual", price: "30000", originalPrice: "36000" }
+      ],
+      description: "Remote coaching with personalized plans",
+      color: "gray",
+      icon: "💻",
+      highlights: [
+        "Virtual Training Sessions",
+        "Custom Workout Plans",
+        "Diet & Nutrition Plans",
+        "24/7 WhatsApp Support",
+        "Weekly Progress Check",
+        "Video Form Correction",
+        "Online Consultation"
       ]
     },
     {
@@ -77,9 +101,12 @@ const PackageSection = () => {
       icon: "🏆",
       popular: true,
       highlights: [
-        "Professional Guidance",
-        "Customized Diet Plans",
-        "Posing Practice",
+        "Professional Contest Guidance",
+        "Customized Workout Plans",
+        "Posing Practice Sessions",
+        "Diet & Nutrition Planning",
+        "Progress Tracking",
+        "Supplement Guidance",
         "Competition Strategy"
       ]
     }
@@ -193,10 +220,10 @@ const PackageSection = () => {
               </div>
 
               {pkg.highlights && pkg.name !== "Personal Training" && (
-                <div className="mt-2 mb-4 space-y-2">
+                <div className="mt-2 mb-4 space-y-1">
                   {pkg.highlights.map((highlight, i) => (
-                    <div key={i} className="flex items-center text-gray-300 text-sm">
-                      <svg className="w-4 h-4 mr-2 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <div key={i} className="flex items-start text-gray-300 text-xs">
+                      <svg className="w-3.5 h-3.5 mr-1.5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
                       </svg>
                       {highlight}
@@ -217,7 +244,8 @@ const PackageSection = () => {
               <Link
                 to={`/contact?package=${pkg.name === "Normal Gym Fees" ? "normal" : 
                      pkg.name === "Normal Fees + Treadmill" ? "treadmill" : 
-                     pkg.name === "Personal Training" ? "personal" : "contest"}`}
+                     pkg.name === "Personal Training" ? "personal" :
+                     pkg.name === "Online Coaching" ? "online" : "contest"}`}
                 className={`inline-flex items-center justify-center w-full px-4 py-2 mt-auto text-sm font-medium text-white 
                   ${pkg.name === "Normal Fees + Treadmill" || pkg.name === "Contest Preparation" ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'} 
                   rounded-lg transition-all duration-300 hover:scale-105`}

@@ -26,6 +26,9 @@ const Contact = () => {
         case 'personal':
           packageType = 'personal';
           break;
+        case 'online':
+          packageType = 'online';
+          break;
         case 'contest':
           packageType = 'contest';
           break;
@@ -75,6 +78,12 @@ const Contact = () => {
       case 'personal':
         return {
           name: 'Personal Training',
+          price: 3000,
+          duration: 'month'
+        };
+      case 'online':
+        return {
+          name: 'Online Coaching',
           price: 3000,
           duration: 'month'
         };
@@ -436,6 +445,7 @@ const Contact = () => {
                   <option value="normal">Normal Gym Fees (₹700/month)</option>
                   <option value="treadmill">Normal Fees + Treadmill (₹900/month)</option>
                   <option value="personal">Personal Training (₹3,000/month)</option>
+                  <option value="online">Online Coaching (₹3,000/month)</option>
                   <option value="contest">Contest Preparation (₹6,000/month)</option>
                 </select>
               </div>
