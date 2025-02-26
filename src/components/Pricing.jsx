@@ -1,11 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import video3 from "../assets/vid-3.mp4";
 import { Link } from "react-router-dom";
 
 const PackageSection = () => {
+  const [expandedCards, setExpandedCards] = useState({});
+
+  const toggleCardExpansion = (cardName, e) => {
+    e.preventDefault();
+    setExpandedCards(prev => ({
+      ...prev,
+      [cardName]: !prev[cardName]
+    }));
+  };
+
   const packages = [
     {
       name: "Normal Gym Fees",
@@ -220,16 +230,45 @@ const PackageSection = () => {
               </div>
 
               {pkg.highlights && pkg.name !== "Personal Training" && (
-                <div className="mt-2 mb-4 space-y-1">
-                  {pkg.highlights.map((highlight, i) => (
-                    <div key={i} className="flex items-start text-gray-300 text-xs">
-                      <svg className="w-3.5 h-3.5 mr-1.5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-                      </svg>
-                      {highlight}
-                    </div>
-                  ))}
-                </div>
+                <>
+                  <div className="mt-2 mb-2">
+                    {!expandedCards[pkg.name] ? (
+                      <>
+                        {pkg.highlights.slice(0, 3).map((highlight, i) => (
+                          <div key={i} className="flex items-start text-gray-300 text-xs mb-1">
+                            <svg className="w-3.5 h-3.5 mr-1.5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                            </svg>
+                            {highlight}
+                          </div>
+                        ))}
+                        <button 
+                          onClick={(e) => toggleCardExpansion(pkg.name, e)}
+                          className="flex items-center justify-center w-full text-xs text-red-400 mt-2 hover:text-red-300"
+                        >
+                          View all features <FaChevronDown className="ml-1" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {pkg.highlights.map((highlight, i) => (
+                          <div key={i} className="flex items-start text-gray-300 text-xs mb-1">
+                            <svg className="w-3.5 h-3.5 mr-1.5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                            </svg>
+                            {highlight}
+                          </div>
+                        ))}
+                        <button 
+                          onClick={(e) => toggleCardExpansion(pkg.name, e)}
+                          className="flex items-center justify-center w-full text-xs text-red-400 mt-2 hover:text-red-300"
+                        >
+                          Show less <FaChevronUp className="ml-1" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </>
               )}
 
               {pkg.studentOffer && (
