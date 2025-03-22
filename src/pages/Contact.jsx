@@ -199,10 +199,15 @@ const Contact = () => {
     setStatus({ type: '', message: '' });
 
     console.log('Submitting form with data:', formData);
-    console.log('Backend URL:', import.meta.env.VITE_BACKEND_URL);
-
+    
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/contact`, {
+      // Get API URL from environment variables or use the proxy defined in netlify.toml
+      const apiBaseUrl = import.meta.env.VITE_API_URL || '/api';
+      const apiUrl = `${apiBaseUrl}/contact`;
+      
+      console.log('Sending request to:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

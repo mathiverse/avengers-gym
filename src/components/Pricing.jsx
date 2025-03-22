@@ -116,7 +116,7 @@ const PackageSection = () => {
         "Posing Practice Sessions",
         "Diet & Nutrition Planning",
         "Progress Tracking",
-        "Supplement Guidance",
+        "Supplement Guidance", 
         "Competition Strategy"
       ]
     }
