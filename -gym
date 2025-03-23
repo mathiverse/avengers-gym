@@ -1,0 +1,14 @@
+[33mcommit 8fd5b94200b2c98fd0e63ca74738bef9b97eb0bd[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: mathiyalagan <mathiyalaganbrave@gmail.com>
+Date:   Sun Mar 23 17:27:21 2025 +0530
+
+    Fix API endpoint URL construction and update environment variables
+    
+    - Update URL path in Contact.jsx to handle various API URL formats
+    
+    - Update environment variables to correctly target the Netlify function
+    
+    - Improve error handling for API responses
+
+.env
+src/pages/Contact.jsx
