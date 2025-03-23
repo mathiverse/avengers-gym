@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/datepicker.css"; // Import our custom styles
-import { FaCreditCard, FaUniversity, FaQrcode, FaMoneyBillWave } from 'react-icons/fa';
+import { FaCreditCard, FaUniversity, FaQrcode, FaMoneyBillWave, FaSpinner } from 'react-icons/fa';
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -114,36 +114,28 @@ const Contact = () => {
     }));
   };
 
-  // Function to proceed to next step
-  const handleNextStep = (e) => {
-    e.preventDefault();
-    if (validateCurrentStep()) {
-      setCurrentStep(prev => prev + 1);
-      // Scroll to top of the page smoothly
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+  // Check if the form has all required fields filled
+  const isFormValid = () => {
+    return (
+      formData.name &&
+      formData.email &&
+      formData.phone &&
+      formData.packageType &&
+      formData.trainingType &&
+      formData.bookingDate
+    );
+  };
+
+  // Handle next step - Modified to only show summary without payment gateway
+  const handleNextStep = () => {
+    if (isFormValid()) {
+      setCurrentStep(2);
+    } else {
+      setStatus({
+        type: 'error',
+        message: 'Please fill all required fields'
       });
     }
-  };
-
-  // Function to go back to previous step
-  const handlePreviousStep = () => {
-    setCurrentStep(prev => prev - 1);
-    // Also scroll to top when going back
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  // Validate current step
-  const validateCurrentStep = () => {
-    if (currentStep === 1) {
-      return formData.name && formData.email && formData.phone && 
-             formData.packageType && formData.trainingType && formData.bookingDate && formData.paymentType;
-    }
-    return true;
   };
 
   // Handle date change
@@ -203,19 +195,38 @@ const Contact = () => {
     try {
       // Get API URL from environment variables or use the proxy defined in netlify.toml
       const apiBaseUrl = import.meta.env.VITE_API_URL || '/api';
-      const apiUrl = `${apiBaseUrl}/contact`;
+      // For the Netlify function with basePath: '/api', we need to add /api before /contact
+      const apiUrl = `${apiBaseUrl}${apiBaseUrl.endsWith('/api') ? '' : '/api'}/contact`;
       
       console.log('Sending request to:', apiUrl);
+      
+      // Create a simplified version of the form data without payment details
+      const simplifiedFormData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        packageType: formData.packageType,
+        trainingType: formData.trainingType,
+        message: formData.message,
+        bookingDate: formData.bookingDate
+      };
       
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(simplifiedFormData)
       });
 
       console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error('Server returned an error. Please try again later.');
+      }
+      
       const data = await response.json();
       console.log('Response data:', data);
       
@@ -265,7 +276,7 @@ const Contact = () => {
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 14);
 
-  // Render payment section
+  // Render payment section - simplified to just show booking summary
   const renderPaymentSection = () => {
     const packageDetails = getPackageDetails(formData.packageType);
     
@@ -282,61 +293,16 @@ const Contact = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-white">Select Payment Method</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              type="button"
-              onClick={() => handlePaymentMethodSelect('card')}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                formData.paymentMethod === 'card'
-                  ? 'border-red-500 bg-red-500 bg-opacity-20'
-                  : 'border-gray-600 hover:border-red-500'
-              }`}
-            >
-              <div className="flex flex-col items-center text-white space-y-2">
-                <FaCreditCard className="text-2xl" />
-                <span>Card Payment</span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handlePaymentMethodSelect('netbanking')}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                formData.paymentMethod === 'netbanking'
-                  ? 'border-red-500 bg-red-500 bg-opacity-20'
-                  : 'border-gray-600 hover:border-red-500'
-              }`}
-            >
-              <div className="flex flex-col items-center text-white space-y-2">
-                <FaUniversity className="text-2xl" />
-                <span>Net Banking</span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handlePaymentMethodSelect('upi')}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                formData.paymentMethod === 'upi'
-                  ? 'border-red-500 bg-red-500 bg-opacity-20'
-                  : 'border-gray-600 hover:border-red-500'
-              }`}
-            >
-              <div className="flex flex-col items-center text-white space-y-2">
-                <FaQrcode className="text-2xl" />
-                <span>UPI</span>
-              </div>
-            </button>
+        <div className="bg-black bg-opacity-40 p-6 rounded-lg">
+          <h3 className="text-xl font-semibold text-white mb-4">Payment Information</h3>
+          <div className="space-y-3 text-gray-300">
+            <p>Please pay at the gym during your first session. We accept cash and all major cards.</p>
+            <p>If you prefer to pay online, our staff will provide payment options when they contact you.</p>
+            <p className="text-sm italic mt-4">
+              By confirming your booking, you agree to our terms and conditions.
+              Your session will be confirmed after our staff contacts you.
+            </p>
           </div>
-        </div>
-
-        <div className="pt-4">
-          <p className="text-sm text-gray-400 mb-4">
-            By proceeding with the payment, you agree to our terms and conditions.
-            Your booking will be confirmed after successful payment.
-          </p>
         </div>
       </div>
     );
@@ -518,41 +484,6 @@ const Contact = () => {
               </div>
 
               <div>
-                <label className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-300">Payment Type</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => handlePaymentTypeSelect('direct')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      formData.paymentType === 'direct'
-                        ? 'border-red-500 bg-red-500 bg-opacity-20'
-                        : 'border-gray-600 hover:border-red-500'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center text-white space-y-2">
-                      <FaMoneyBillWave className="text-2xl" />
-                      <span>Direct Payment at Gym</span>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handlePaymentTypeSelect('online')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      formData.paymentType === 'online'
-                        ? 'border-red-500 bg-red-500 bg-opacity-20'
-                        : 'border-gray-600 hover:border-red-500'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center text-white space-y-2">
-                      <FaCreditCard className="text-2xl" />
-                      <span>Online Payment</span>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              <div>
                 <label htmlFor="message" className="block mb-2 text-sm font-medium text-white-900 dark:text-gray-400">Additional Information</label>
                 <textarea
                   id="message"
@@ -575,13 +506,13 @@ const Contact = () => {
             {currentStep === 1 && (
               <button
                 type="button"
-                onClick={formData.paymentType === 'direct' ? handleSubmit : handleNextStep}
-                disabled={!validateCurrentStep()}
+                onClick={handleNextStep}
+                disabled={!isFormValid()}
                 className={`py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-red-700 w-full hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 ${
-                  !validateCurrentStep() ? 'opacity-50 cursor-not-allowed' : ''
+                  !isFormValid() ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
-                {formData.paymentType === 'direct' ? 'Book Session' : 'Proceed to Payment'}
+                Proceed to Summary
               </button>
             )}
             
@@ -589,20 +520,27 @@ const Contact = () => {
               <>
                 <button
                   type="button"
-                  onClick={handlePreviousStep}
-                  className="py-3 px-5 text-sm font-medium text-center text-white rounded-lg border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 w-1/2"
+                  onClick={() => setCurrentStep(1)}
+                  className="py-3 px-5 text-sm font-medium text-center text-white rounded-lg border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 mr-2"
                 >
                   Back
                 </button>
                 
                 <button
-                  type="submit"
-                  disabled={isLoading || !formData.paymentMethod}
-                  className={`py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-red-700 w-1/2 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 ${
-                    (isLoading || !formData.paymentMethod) ? 'opacity-50 cursor-not-allowed' : ''
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                  className={`py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  {isLoading ? 'Processing...' : 'Pay Now'}
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <FaSpinner className="animate-spin mr-2" /> Sending...
+                    </span>
+                  ) : (
+                    'Confirm Booking'
+                  )}
                 </button>
               </>
             )}
